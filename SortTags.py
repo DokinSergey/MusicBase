@@ -9,7 +9,7 @@ __verdate__ = '2025-08-02 14:03'
 ########################################################################################################################
 if (debug := bool(sys.argv[1]) if len(sys.argv) > 1  else False):
     rpn(f'debug is [orange_red1]{debug}')
-SQLiteBase:str = f"{os.environ['APPDATA']}\\foobar2000-v2\\configuration\\foo_sqlite.user.db"
+SQLiteBase:str = fr"{os.environ['APPDATA']}\foobar2000-v2\configuration\foo_sqlite.user.db"
 # r"C:/Users/dokin/AppData/Roaming/foobar2000/configuration/foo_sqlite.user.db"
 #pylint: disable-msg=W0602
 ListTrack:dict[int,int] = {}
@@ -54,7 +54,7 @@ def NewStep (IdTrack: int, OldStp: int, ArtStp: int, GrStp: int,dbg:bool = False
         if not (CurTrk := OldStp + ArtStp * GrStp): CurTrk = 1
         # rpn(f'{IdTrack  = :4} {CurTrk    = :4} {OldStp  = :4} {ArtStp    = :4} {GrStp = :4}\n')
         while CurTrk <= AllCount : # первое условие, вмещаемся, проверяем на занятость
-            if ListTrack[CurTrk] == 0:
+            if not ListTrack.get(CurTrk,0):
                 ListTrack[CurTrk] = IdTrack
                 res = CurTrk
                 break
@@ -255,8 +255,9 @@ if __name__ == '__main__':
         rpn(f'\t[orange_red1]EO:{str(ErrMs)}')
         rpn(f'\t[orange_red1]{traceback.format_exc()}')
     finally:
-        MusBase.commit()
-        MusBase.close()
+        if MusBase:
+            MusBase.commit()
+            MusBase.close()
     rpn()
 #-----------------------------------------------------------------
     input('Выход:-> ')
